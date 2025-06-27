@@ -62,32 +62,30 @@ func (h *FrontendHandler) ShowPortfolio(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
-func (h *FrontendHandler) ShowPortfolioDetail() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles(
-			"web/templates/layout.html",
-			"web/templates/header.html",
-			"web/templates/footer.html",
-			"web/templates/portfolio_detail.html",
-		))
+func (h *FrontendHandler) ShowPortfolioDetail(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles(
+		"web/templates/layout.html",
+		"web/templates/header.html",
+		"web/templates/footer.html",
+		"web/templates/portfolio_detail.html",
+	))
 
-		idStr := chi.URLParam(r, "id")
-		id, err := strconv.Atoi(idStr)
-		if err != nil {
-			http.Error(w, "invalid portfolio id", http.StatusBadRequest)
-			return
-		}
-
-		item, err := h.apiService.GetPortfolioByID(id)
-		if err != nil {
-			http.Error(w, "portfolio not found", http.StatusNotFound)
-			return
-		}
-
-		tmpl.ExecuteTemplate(w, "layout", map[string]interface{}{
-			"Portfolio": item,
-		})
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "invalid portfolio id", http.StatusBadRequest)
+		return
 	}
+
+	item, err := h.apiService.GetPortfolioByID(id)
+	if err != nil {
+		http.Error(w, "portfolio not found", http.StatusNotFound)
+		return
+	}
+
+	tmpl.ExecuteTemplate(w, "layout", map[string]interface{}{
+		"Portfolio": item,
+	})
 }
 
 func (h *FrontendHandler) ShowContactForm(w http.ResponseWriter, r *http.Request) {
@@ -100,10 +98,33 @@ func (h *FrontendHandler) ShowContactForm(w http.ResponseWriter, r *http.Request
 	tmpl.ExecuteTemplate(w, "layout", nil)
 }
 
-func (h *FrontendHandler) SubmitContact(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	name := r.FormValue("name")
-	w.Write([]byte("Thanks, " + name + ". Your message has been received."))
+func (h *FrontendHandler) SubmitContactForm(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	contact := model.Contact{
+		Name:    r.FormValue("name"),
+		Email:   r.FormValue("email"),
+		Subject: r.FormValue("subject"),
+		Message: r.FormValue("message"),
+	}
+
+	// Validasi
+	if contact.Name == "" || contact.Email == "" || contact.Subject == "" || contact.Message == "" {
+		http.Error(w, "Semua field wajib diisi", http.StatusBadRequest)
+		return
+	}
+
+	err = h.apiService.SubmitContact(contact)
+	if err != nil {
+		http.Error(w, "Gagal menyimpan data", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/contact", http.StatusSeeOther)
 }
 
 func (h *FrontendHandler) ShowAbout(w http.ResponseWriter, r *http.Request) {

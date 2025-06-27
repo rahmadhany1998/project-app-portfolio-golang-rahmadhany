@@ -10,6 +10,7 @@ type ApiRepository interface {
 	FindAllPortfolios() ([]model.Portfolio, error)
 	FindPortfolioByID(id int) (*model.Portfolio, error)
 	InsertPortfolio(p model.Portfolio) error
+	SaveContact(contact model.Contact) error
 }
 
 type apiRepo struct {
@@ -69,5 +70,13 @@ func (r apiRepo) InsertPortfolio(p model.Portfolio) error {
 		INSERT INTO portfolios (title, image, short_description, client, website, long_description)
 		VALUES ($1, $2, $3, $4, $5, $6)`
 	_, err := r.db.Exec(query, p.Title, p.Image, p.ShortDescription, p.Client, p.Website, p.LongDescription)
+	return err
+}
+
+func (r apiRepo) SaveContact(contact model.Contact) error {
+	_, err := r.db.Exec(`
+		INSERT INTO contacts (name, email, subject, message)
+		VALUES ($1, $2, $3, $4)`,
+		contact.Name, contact.Email, contact.Subject, contact.Message)
 	return err
 }

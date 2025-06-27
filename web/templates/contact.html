@@ -1,0 +1,32 @@
+{{ define "title" }}Contact Me{{ end }}
+
+{{ define "content" }}
+<section class="contact_area section_gap">
+  <div class="container">
+    <div class="main_title">
+      <h2>Hubungi Saya</h2>
+    </div>
+    <div class="row">
+      <div class="col-lg-8">
+        <form class="row contact_form" action="/contact" method="POST" id="contactForm">
+          <div class="col-md-6 form-group">
+            <input type="text" class="form-control" id="name" name="name" placeholder="Nama" required>
+          </div>
+          <div class="col-md-6 form-group">
+            <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+          </div>
+          <div class="col-md-12 form-group">
+            <input type="text" class="form-control" id="subject" name="subject" placeholder="Subjek" required>
+          </div>
+          <div class="col-md-12 form-group">
+            <textarea class="form-control" name="message" id="message" rows="5" placeholder="Pesan" required></textarea>
+          </div>
+          <div class="col-md-12 text-right">
+            <button type="submit" value="submit" class="btn primary_btn">Kirim Pesan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{{ end }}
