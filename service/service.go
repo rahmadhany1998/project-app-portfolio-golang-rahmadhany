@@ -3,11 +3,11 @@ package service
 import "project-app-portfolio-golang-rahmadhany/repository"
 
 type Service struct {
-	User UserService
+	Api ApiService
 }
 
 func NewService(r *repository.Repository) *Service {
 	return &Service{
-		User: NewUserService(r.User),
+		Api: NewApiService(r.Api),
 	}
 }

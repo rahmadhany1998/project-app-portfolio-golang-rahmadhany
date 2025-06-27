@@ -1,6 +1,7 @@
 package router
 
 import (
+	"net/http"
 	"project-app-portfolio-golang-rahmadhany/handler"
 
 	"github.com/go-chi/chi"
@@ -11,12 +12,12 @@ func NewRouter(h *handler.Handler) *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-	r.Route("/users", func(r chi.Router) {
-		r.Get("/", h.User.GetAll)
-		r.Post("/", h.User.Create)
-		r.Get("/{id}", h.User.GetByID)
-		r.Put("/{id}", h.User.Update)
-		r.Delete("/{id}", h.User.Delete)
+	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
+
+	r.Get("/", h.Frontend.ShowHome)
+
+	r.Route("/api/v1", func(r chi.Router) {
+		r.Get("/profile", h.Api.GetProfile)
 	})
 
 	return r
