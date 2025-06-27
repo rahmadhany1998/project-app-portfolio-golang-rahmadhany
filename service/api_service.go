@@ -8,6 +8,7 @@ import (
 type ApiService interface {
 	GetProfile() (*model.User, error)
 	GetPortfolios() ([]model.Portfolio, error)
+	GetPortfolioByID(id int) (*model.Portfolio, error)
 }
 
 type apiService struct {
@@ -24,4 +25,8 @@ func (s apiService) GetProfile() (*model.User, error) {
 
 func (s *apiService) GetPortfolios() ([]model.Portfolio, error) {
 	return s.apiRepo.FindAllPortfolios()
+}
+
+func (s apiService) GetPortfolioByID(id int) (*model.Portfolio, error) {
+	return s.apiRepo.FindPortfolioByID(id)
 }

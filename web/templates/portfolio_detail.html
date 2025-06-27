@@ -1,0 +1,28 @@
+{{ define "title" }}Portfolio Detail{{ end }}
+
+{{ define "content" }}
+<section class="portfolio_details_area section_gap">
+        <div class="container">
+            <div class="portfolio_details_inner">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="left_img">
+                            <img class="img-fluid" src="{{ .Portfolio.Image }}" alt="">
+                        </div>
+                    </div>
+                    <div class="offset-lg-1 col-lg-5">
+                        <div class="portfolio_right_text mt-30">
+                            <h4 class="text-uppercase">{{ .Portfolio.Title }}</h4>
+                            <p>{{ .Portfolio.ShortDescription }}</p>
+                            <ul class="list">
+                                <li><span>Client</span>: {{ .Portfolio.Client }}</li>
+                                <li><span>Website</span>: {{ .Portfolio.Website }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <p>{{ .Portfolio.LongDescription }}</p>
+            </div>
+        </div>
+    </section>
+{{ end }}
