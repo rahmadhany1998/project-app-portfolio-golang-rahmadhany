@@ -1,7 +1,10 @@
 package handler
 
 import (
+	"io"
 	"net/http"
+	"os"
+	"project-app-portfolio-golang-rahmadhany/model"
 	"project-app-portfolio-golang-rahmadhany/service"
 	"project-app-portfolio-golang-rahmadhany/util"
 	"strconv"
@@ -55,4 +58,62 @@ func (h *ApiHandler) GetPortfolioDetail(w http.ResponseWriter, r *http.Request) 
 	}
 
 	util.WriteSuccess(w, "portfolio detail fetched", portfolio)
+}
+
+func (h *ApiHandler) CreatePortfolio(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseMultipartForm(10 << 20) // 10 MB max
+	if err != nil {
+		util.WriteError(w, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	title := r.FormValue("title")
+	shortDesc := r.FormValue("short_description")
+	client := r.FormValue("client")
+	website := r.FormValue("website")
+	longDesc := r.FormValue("long_description")
+
+	if title == "" || shortDesc == "" || client == "" || website == "" || longDesc == "" {
+		util.WriteError(w, "Semua field harus diisi", http.StatusBadRequest)
+		return
+	}
+
+	file, handler, err := r.FormFile("image_file")
+	if err != nil {
+		util.WriteError(w, "File image wajib diunggah", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	filename := handler.Filename
+	image := "/static/img/portfolio/" + filename
+	savePath := "web/static/img/portfolio/" + filename
+
+	out, err := os.Create(savePath)
+	if err != nil {
+		util.WriteError(w, "Gagal menyimpan gambar", http.StatusInternalServerError)
+		return
+	}
+	defer out.Close()
+	_, err = io.Copy(out, file)
+	if err != nil {
+		util.WriteError(w, "Gagal menyalin gambar", http.StatusInternalServerError)
+		return
+	}
+
+	portfolio := model.Portfolio{
+		Title:            title,
+		Image:            image,
+		ShortDescription: shortDesc,
+		Client:           client,
+		Website:          website,
+		LongDescription:  longDesc,
+	}
+
+	if err := h.service.AddPortfolio(portfolio); err != nil {
+		util.WriteError(w, "Gagal menyimpan data ke database", http.StatusInternalServerError)
+		return
+	}
+
+	util.WriteSuccess(w, "Portfolio berhasil ditambahkan", nil)
 }

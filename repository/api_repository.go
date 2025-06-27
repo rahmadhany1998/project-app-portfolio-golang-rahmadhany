@@ -9,6 +9,7 @@ type ApiRepository interface {
 	FindFirst() (*model.User, error)
 	FindAllPortfolios() ([]model.Portfolio, error)
 	FindPortfolioByID(id int) (*model.Portfolio, error)
+	InsertPortfolio(p model.Portfolio) error
 }
 
 type apiRepo struct {
@@ -61,4 +62,12 @@ func (r apiRepo) FindPortfolioByID(id int) (*model.Portfolio, error) {
 		return nil, err
 	}
 	return &p, nil
+}
+
+func (r apiRepo) InsertPortfolio(p model.Portfolio) error {
+	query := `
+		INSERT INTO portfolios (title, image, short_description, client, website, long_description)
+		VALUES ($1, $2, $3, $4, $5, $6)`
+	_, err := r.db.Exec(query, p.Title, p.Image, p.ShortDescription, p.Client, p.Website, p.LongDescription)
+	return err
 }

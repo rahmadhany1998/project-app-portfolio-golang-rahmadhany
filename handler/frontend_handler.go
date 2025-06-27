@@ -2,9 +2,12 @@ package handler
 
 import (
 	"html/template"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 
+	"project-app-portfolio-golang-rahmadhany/model"
 	"project-app-portfolio-golang-rahmadhany/service"
 
 	"github.com/go-chi/chi"
@@ -111,4 +114,73 @@ func (h *FrontendHandler) ShowAbout(w http.ResponseWriter, r *http.Request) {
 		"web/templates/about.html",
 	))
 	tmpl.ExecuteTemplate(w, "layout", nil)
+}
+
+func (h *FrontendHandler) ShowAddPortfolioForm(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles(
+		"web/templates/layout.html",
+		"web/templates/header.html",
+		"web/templates/footer.html",
+		"web/templates/portfolio_add.html",
+	))
+	tmpl.ExecuteTemplate(w, "layout", nil)
+}
+
+func (h *FrontendHandler) SubmitPortfolio(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseMultipartForm(10 << 20) // 10 MB max
+	if err != nil {
+		http.Error(w, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	title := r.FormValue("title")
+	shortDesc := r.FormValue("short_description")
+	client := r.FormValue("client")
+	website := r.FormValue("website")
+	longDesc := r.FormValue("long_description")
+
+	if title == "" || shortDesc == "" || client == "" || website == "" || longDesc == "" {
+		http.Error(w, "Semua field harus diisi", http.StatusBadRequest)
+		return
+	}
+
+	file, handler, err := r.FormFile("image_file")
+	if err != nil {
+		http.Error(w, "File upload error", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	filename := handler.Filename
+	image := "/static/img/portfolio/" + filename
+	savePath := "web/static/img/portfolio/" + filename
+	out, err := os.Create(savePath)
+	if err != nil {
+		http.Error(w, "Failed to save file", http.StatusInternalServerError)
+		return
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, file)
+	if err != nil {
+		http.Error(w, "Failed to save image", http.StatusInternalServerError)
+		return
+	}
+
+	portfolio := model.Portfolio{
+		Title:            title,
+		Image:            image,
+		ShortDescription: shortDesc,
+		Client:           client,
+		Website:          website,
+		LongDescription:  longDesc,
+	}
+
+	err = h.apiService.AddPortfolio(portfolio)
+	if err != nil {
+		http.Error(w, "Failed to save portfolio", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/portfolio", http.StatusSeeOther)
 }

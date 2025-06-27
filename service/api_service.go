@@ -9,6 +9,7 @@ type ApiService interface {
 	GetProfile() (*model.User, error)
 	GetPortfolios() ([]model.Portfolio, error)
 	GetPortfolioByID(id int) (*model.Portfolio, error)
+	AddPortfolio(p model.Portfolio) error
 }
 
 type apiService struct {
@@ -29,4 +30,8 @@ func (s *apiService) GetPortfolios() ([]model.Portfolio, error) {
 
 func (s apiService) GetPortfolioByID(id int) (*model.Portfolio, error) {
 	return s.apiRepo.FindPortfolioByID(id)
+}
+
+func (s apiService) AddPortfolio(p model.Portfolio) error {
+	return s.apiRepo.InsertPortfolio(p)
 }
