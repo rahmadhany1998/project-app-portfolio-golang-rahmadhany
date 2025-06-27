@@ -117,3 +117,31 @@ func (h *ApiHandler) CreatePortfolio(w http.ResponseWriter, r *http.Request) {
 
 	util.WriteSuccess(w, "Portfolio berhasil ditambahkan", nil)
 }
+
+func (h *ApiHandler) SubmitContact(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseMultipartForm(10 << 20)
+	if err != nil {
+		util.WriteError(w, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	contact := model.Contact{
+		Name:    r.FormValue("name"),
+		Email:   r.FormValue("email"),
+		Subject: r.FormValue("subject"),
+		Message: r.FormValue("message"),
+	}
+
+	if contact.Name == "" || contact.Email == "" || contact.Subject == "" || contact.Message == "" {
+		util.WriteError(w, "Semua field wajib diisi", http.StatusBadRequest)
+		return
+	}
+
+	err = h.service.SubmitContact(contact)
+	if err != nil {
+		util.WriteError(w, "Gagal menyimpan data", http.StatusInternalServerError)
+		return
+	}
+
+	util.WriteSuccess(w, "Pesan berhasil dikirim", nil)
+}
