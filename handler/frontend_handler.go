@@ -13,6 +13,12 @@ type FrontendHandler struct {
 }
 
 func NewFrontendHandler(apiService service.ApiService) *FrontendHandler {
+	return &FrontendHandler{
+		apiService: apiService,
+	}
+}
+
+func (h *FrontendHandler) ShowHome(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
 		"web/templates/layout.html",
 		"web/templates/header.html",
@@ -20,20 +26,13 @@ func NewFrontendHandler(apiService service.ApiService) *FrontendHandler {
 		"web/templates/index.html",
 	))
 
-	return &FrontendHandler{
-		tmpl:       tmpl,
-		apiService: apiService,
-	}
-}
-
-func (h *FrontendHandler) ShowHome(w http.ResponseWriter, r *http.Request) {
 	user, err := h.apiService.GetProfile()
 	if err != nil {
 		http.Error(w, "failed to load user profile", http.StatusInternalServerError)
 		return
 	}
 
-	h.tmpl.ExecuteTemplate(w, "layout", map[string]interface{}{
+	tmpl.ExecuteTemplate(w, "layout", map[string]interface{}{
 		"Name": user.Name,
 		"Job":  user.Job,
 	})
@@ -54,4 +53,23 @@ func (h *FrontendHandler) SubmitContact(w http.ResponseWriter, r *http.Request) 
 
 func (h *FrontendHandler) ShowAbout(w http.ResponseWriter, r *http.Request) {
 	h.tmpl.ExecuteTemplate(w, "layout", nil)
+}
+
+func (h *FrontendHandler) ShowPortfolio(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles(
+		"web/templates/layout.html",
+		"web/templates/header.html",
+		"web/templates/footer.html",
+		"web/templates/portfolio.html",
+	))
+
+	items, err := h.apiService.GetPortfolios()
+	if err != nil {
+		http.Error(w, "failed to load portfolio", http.StatusInternalServerError)
+		return
+	}
+
+	tmpl.ExecuteTemplate(w, "layout", map[string]interface{}{
+		"Portfolios": items,
+	})
 }

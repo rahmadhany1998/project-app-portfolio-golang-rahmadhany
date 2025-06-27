@@ -26,3 +26,13 @@ func (h *ApiHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 		"job":  user.Job,
 	})
 }
+
+func (h *ApiHandler) GetPortfolios(w http.ResponseWriter, r *http.Request) {
+	items, err := h.service.GetPortfolios()
+	if err != nil {
+		util.WriteError(w, "failed to fetch portfolios", http.StatusInternalServerError)
+		return
+	}
+
+	util.WriteSuccess(w, "portfolio list", items)
+}

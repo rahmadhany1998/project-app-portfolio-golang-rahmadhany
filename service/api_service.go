@@ -7,6 +7,7 @@ import (
 
 type ApiService interface {
 	GetProfile() (*model.User, error)
+	GetPortfolios() ([]model.Portfolio, error)
 }
 
 type apiService struct {
@@ -19,4 +20,8 @@ func NewApiService(repo repository.ApiRepository) ApiService {
 
 func (s apiService) GetProfile() (*model.User, error) {
 	return s.apiRepo.FindFirst()
+}
+
+func (s *apiService) GetPortfolios() ([]model.Portfolio, error) {
+	return s.apiRepo.FindAllPortfolios()
 }

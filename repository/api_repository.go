@@ -7,6 +7,7 @@ import (
 
 type ApiRepository interface {
 	FindFirst() (*model.User, error)
+	FindAllPortfolios() ([]model.Portfolio, error)
 }
 
 type apiRepo struct {
@@ -26,4 +27,22 @@ func (r apiRepo) FindFirst() (*model.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (r *apiRepo) FindAllPortfolios() ([]model.Portfolio, error) {
+	rows, err := r.db.Query("SELECT id, title, image FROM portfolios")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var portfolios []model.Portfolio
+	for rows.Next() {
+		var p model.Portfolio
+		if err := rows.Scan(&p.ID, &p.Title, &p.Image); err != nil {
+			return nil, err
+		}
+		portfolios = append(portfolios, p)
+	}
+	return portfolios, nil
 }
