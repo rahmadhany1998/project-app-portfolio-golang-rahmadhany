@@ -8,9 +8,16 @@ import (
 	"project-app-portfolio-golang-rahmadhany/repository"
 	"project-app-portfolio-golang-rahmadhany/router"
 	"project-app-portfolio-golang-rahmadhany/service"
+	"project-app-portfolio-golang-rahmadhany/util"
 )
 
 func main() {
+	err := util.Init(false) // or true for production
+	if err != nil {
+		log.Fatalf("Failed to initialize logger: %v", err)
+	}
+	defer util.Log.Sync()
+
 	conn, err := database.NewPostgresDB()
 	if err != nil {
 		log.Fatalf("Database error: %v", err)
