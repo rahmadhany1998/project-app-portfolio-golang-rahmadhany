@@ -11,6 +11,7 @@ type ApiRepository interface {
 	FindPortfolioByID(id int) (*model.Portfolio, error)
 	InsertPortfolio(p model.Portfolio) error
 	SaveContact(contact model.Contact) error
+	GetAllExperiences() ([]model.Experience, error)
 }
 
 type apiRepo struct {
@@ -22,10 +23,10 @@ func NewApiRepository(db *sql.DB) ApiRepository {
 }
 
 func (r apiRepo) FindFirst() (*model.User, error) {
-	row := r.db.QueryRow("SELECT id, name, job FROM users LIMIT 1")
+	row := r.db.QueryRow("SELECT id, name, job, photo, description FROM users LIMIT 1")
 
 	var user model.User
-	err := row.Scan(&user.ID, &user.Name, &user.Job)
+	err := row.Scan(&user.ID, &user.Name, &user.Job, &user.Photo, &user.Description)
 	if err != nil {
 		return nil, err
 	}
@@ -79,4 +80,22 @@ func (r apiRepo) SaveContact(contact model.Contact) error {
 		VALUES ($1, $2, $3, $4)`,
 		contact.Name, contact.Email, contact.Subject, contact.Message)
 	return err
+}
+
+func (r apiRepo) GetAllExperiences() ([]model.Experience, error) {
+	rows, err := r.db.Query("SELECT id, year, company, position, task FROM experiences ORDER BY year DESC")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var experiences []model.Experience
+	for rows.Next() {
+		var exp model.Experience
+		if err := rows.Scan(&exp.ID, &exp.Year, &exp.Company, &exp.Position, &exp.Task); err != nil {
+			return nil, err
+		}
+		experiences = append(experiences, exp)
+	}
+	return experiences, nil
 }

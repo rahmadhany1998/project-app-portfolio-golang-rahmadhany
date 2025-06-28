@@ -1,0 +1,20 @@
+{{ define "title" }}About Me{{ end }}
+
+{{ define "content" }}
+<section class="about_area section_gap">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-5">
+        <img class="img-fluid" src="{{ .User.Photo }}" alt="{{ .User.Name }}">
+      </div>
+      <div class="col-lg-7">
+        <div class="main_title">
+          <h2>{{ .User.Name }}</h2>
+          <h4>{{ .User.Job }}</h4>
+        </div>
+        <p>{{ .User.Description }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+{{ end }}

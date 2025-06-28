@@ -1,0 +1,33 @@
+{{ define "title" }}Experience{{ end }}
+
+{{ define "content" }}
+<section class="section_gap">
+  <div class="container">
+    <div class="main_title">
+      <h2>Pengalaman Kerja</h2>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Tahun</th>
+            <th>Perusahaan</th>
+            <th>Posisi</th>
+            <th>Tugas</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ range .Experiences }}
+          <tr>
+            <td>{{ .Year }}</td>
+            <td>{{ .Company }}</td>
+            <td>{{ .Position }}</td>
+            <td>{{ .Task }}</td>
+          </tr>
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{{ end }}

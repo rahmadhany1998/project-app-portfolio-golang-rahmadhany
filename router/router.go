@@ -21,6 +21,8 @@ func NewRouter(h *handler.Handler) *chi.Mux {
 	r.Post("/portfolio/add", h.Frontend.SubmitPortfolio)
 	r.Get("/contact", h.Frontend.ShowContactForm)
 	r.Post("/contact", h.Frontend.SubmitContactForm)
+	r.Get("/about", h.Frontend.ShowAbout)
+	r.Get("/experience", h.Frontend.ShowExperience)
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/profile", h.Api.GetProfile)
@@ -28,6 +30,8 @@ func NewRouter(h *handler.Handler) *chi.Mux {
 		r.Get("/portfolios/{id}", h.Api.GetPortfolioDetail)
 		r.Post("/portfolios/add", h.Api.CreatePortfolio)
 		r.Post("/contact", h.Api.SubmitContact)
+		r.Get("/about", h.Api.GetAbout)
+		r.Get("/experience", h.Api.GetAllExperiences)
 	})
 
 	return r

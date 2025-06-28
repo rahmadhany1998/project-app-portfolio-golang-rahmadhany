@@ -134,7 +134,15 @@ func (h *FrontendHandler) ShowAbout(w http.ResponseWriter, r *http.Request) {
 		"web/templates/footer.html",
 		"web/templates/about.html",
 	))
-	tmpl.ExecuteTemplate(w, "layout", nil)
+	user, err := h.apiService.GetProfile()
+	if err != nil {
+		http.Error(w, "failed to load about", http.StatusInternalServerError)
+		return
+	}
+
+	tmpl.ExecuteTemplate(w, "layout", map[string]interface{}{
+		"User": user,
+	})
 }
 
 func (h *FrontendHandler) ShowAddPortfolioForm(w http.ResponseWriter, r *http.Request) {
@@ -204,4 +212,23 @@ func (h *FrontendHandler) SubmitPortfolio(w http.ResponseWriter, r *http.Request
 	}
 
 	http.Redirect(w, r, "/portfolio", http.StatusSeeOther)
+}
+
+func (h *FrontendHandler) ShowExperience(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles(
+		"web/templates/layout.html",
+		"web/templates/header.html",
+		"web/templates/footer.html",
+		"web/templates/experience.html",
+	))
+
+	experiences, err := h.apiService.GetAllExperiences()
+	if err != nil {
+		http.Error(w, "Gagal mengambil data pengalaman kerja", http.StatusInternalServerError)
+		return
+	}
+
+	tmpl.ExecuteTemplate(w, "layout", map[string]interface{}{
+		"Experiences": experiences,
+	})
 }

@@ -11,6 +11,7 @@ type ApiService interface {
 	GetPortfolioByID(id int) (*model.Portfolio, error)
 	AddPortfolio(p model.Portfolio) error
 	SubmitContact(contact model.Contact) error
+	GetAllExperiences() ([]model.Experience, error)
 }
 
 type apiService struct {
@@ -39,4 +40,8 @@ func (s apiService) AddPortfolio(p model.Portfolio) error {
 
 func (s apiService) SubmitContact(contact model.Contact) error {
 	return s.apiRepo.SaveContact(contact)
+}
+
+func (s apiService) GetAllExperiences() ([]model.Experience, error) {
+	return s.apiRepo.GetAllExperiences()
 }

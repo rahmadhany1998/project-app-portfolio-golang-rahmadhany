@@ -145,3 +145,28 @@ func (h *ApiHandler) SubmitContact(w http.ResponseWriter, r *http.Request) {
 
 	util.WriteSuccess(w, "Pesan berhasil dikirim", nil)
 }
+
+func (h *ApiHandler) GetAbout(w http.ResponseWriter, r *http.Request) {
+	user, err := h.service.GetProfile()
+	if err != nil {
+		util.WriteError(w, "Gagal mengambil data About", http.StatusInternalServerError)
+		return
+	}
+
+	util.WriteSuccess(w, "Data About berhasil diambil", map[string]interface{}{
+		"name":        user.Name,
+		"job":         user.Job,
+		"photo":       user.Photo,
+		"description": user.Description,
+	})
+}
+
+func (h *ApiHandler) GetAllExperiences(w http.ResponseWriter, r *http.Request) {
+	experiences, err := h.service.GetAllExperiences()
+	if err != nil {
+		util.WriteError(w, "Gagal mengambil data pengalaman", http.StatusInternalServerError)
+		return
+	}
+
+	util.WriteSuccess(w, "Data pengalaman berhasil diambil", experiences)
+}
